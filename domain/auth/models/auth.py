@@ -3,10 +3,10 @@ import uuid
 from pydantic import BaseModel as pyBaseModel
 from ormlambda import ORM, Table, Column
 
-from .user import Users, UserModel
+from backend.domain.user.models import Users, UserModel
 from backend.env import log
 
-from backend.internal.db import ddbb
+from backend.core.db import db
 
 
 ####################
@@ -23,7 +23,7 @@ class Auth(Table):
     active: Column[int] = Column(int)
 
 
-AuthORM = ORM(Auth, ddbb)
+AuthORM = ORM(Auth, db)
 
 
 class AuthModel(pyBaseModel):
@@ -196,3 +196,21 @@ class AuthsTable:
 
 
 Auths = AuthsTable()
+
+
+__all__ = [
+    "Auth",
+    "AuthModel",
+    "Token",
+    "ApiKey",
+    "UserResponse",
+    "SiginResponse",
+    "SigninForm",
+    "LdapForm",
+    "ProfileImageUrlForm",
+    "UpdateProfileForm",
+    "UpdatePasswordForm",
+    "SignupForm",
+    "AuthsTable",
+    "Auths",
+]

@@ -3,7 +3,7 @@ import logging
 import os
 from urllib.parse import urlparse
 
-from env import log, BACKEND_AUTH
+from backend.env import log, BACKEND_AUTH
 
 
 class EndpointFilter(logging.Filter):

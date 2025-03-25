@@ -1,8 +1,8 @@
 import time
-from typing import Optional
+from typing import Callable, Optional
 from pydantic import BaseModel as pyBaseModel, ConfigDict
 from ormlambda import ORM, Column, Table
-from backend.internal.db import ddbb
+from backend.core.db import db
 
 
 class User(Table):
@@ -22,7 +22,7 @@ class User(Table):
     info: Column[str]
 
 
-UserORM = ORM(User, ddbb)
+UserORM = ORM(User, db)
 
 
 class UserSettings(pyBaseModel):
@@ -76,6 +76,19 @@ class UserUpdateForm(pyBaseModel):
     password: Optional[str] = None
 
 
+def return_if_error[TError](return_if_error: TError):
+    def decorator[T, **P](f: Callable[P, T]) -> Callable[P, T]:
+        def inner(*args: P.args, **kwargs: P.kwargs) -> T:
+            try:
+                return f(*args, **kwargs)
+            except Exception:
+                return return_if_error
+
+        return inner
+
+    return decorator
+
+
 class UsersTable:
     def insert_new_user(
         self,
@@ -103,26 +116,20 @@ class UsersTable:
         UserORM.insert(result)
         return user if result else None
 
+    @return_if_error(None)
     def get_user_by_id(self, id: str) -> Optional[UserModel]:
-        try:
-            user = UserORM.where(User.id == id).first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        user = UserORM.where(User.id == id).first()
+        return UserModel.model_validate(user)
 
+    @return_if_error(None)
     def get_user_by_api_key(self, api_key: str) -> Optional[UserModel]:
-        try:
-            user = UserORM.where(User.api_key == api_key).first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        user = UserORM.where(User.api_key == api_key).first()
+        return UserModel.model_validate(user)
 
+    @return_if_error(None)
     def get_user_by_email(self, email: str) -> Optional[UserModel]:
-        try:
-            user = UserORM.where(User.email == email).first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        user = UserORM.where(User.email == email).first()
+        return UserModel.model_validate(user)
 
     # def get_user_by_oauth_sub(self, sub: str) -> Optional[UserModel]:
     #     try:
@@ -154,12 +161,10 @@ class UsersTable:
     def get_num_users(self) -> Optional[int]:
         return UserORM.count(execute=True)
 
+    @return_if_error(None)
     def get_first_user(self) -> UserModel:
-        try:
-            user = UserORM.order(lambda x: x.created_at, order_type="DESC").first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        user = UserORM.order(lambda x: x.created_at, order_type="DESC").first()
+        return UserModel.model_validate(user)
 
     # def get_user_webhook_url_by_id(self, id: str) -> Optional[str]:
     #     try:
@@ -177,13 +182,11 @@ class UsersTable:
     #     except Exception:
     #         return None
 
+    @return_if_error(None)
     def update_user_role_by_id(self, id: str, role: str) -> Optional[UserModel]:
-        try:
-            UserORM.where(lambda x: x.id == id).update({"role": role})
-            user = UserORM.where(lambda x: x.id == id).first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        UserORM.where(lambda x: x.id == id).update({"role": role})
+        user = UserORM.where(lambda x: x.id == id).first()
+        return UserModel.model_validate(user)
 
     # def update_user_profile_image_url_by_id(
     #     self, id: str, profile_image_url: str
@@ -200,15 +203,13 @@ class UsersTable:
     #     except Exception:
     #         return None
 
+    @return_if_error(None)
     def update_user_last_active_by_id(self, id: str) -> Optional[UserModel]:
-        try:
-            UserORM.where(lambda x: x.id == id).update(
-                {User.last_active_at: int(time.time())}
-            )
-            user = UserORM.where(User.id == id).first()
-            return UserModel.model_validate(user)
-        except Exception:
-            return None
+        UserORM.where(lambda x: x.id == id).update(
+            {User.last_active_at: int(time.time())}
+        )
+        user = UserORM.where(User.id == id).first()
+        return UserModel.model_validate(user)
 
     # def update_user_oauth_sub_by_id(
     #     self, id: str, oauth_sub: str
@@ -235,37 +236,31 @@ class UsersTable:
     #     except Exception:
     #         return None
 
+    @return_if_error(False)
     def delete_user_by_id(self, id: str) -> bool:
-        try:
-            # # Remove User from Groups
-            # Groups.remove_user_from_all_groups(id)
+        # # Remove User from Groups
+        # Groups.remove_user_from_all_groups(id)
 
-            # # Delete User Chats
-            # result = Chats.delete_chats_by_user_id(id)
-            # if result:
-            #     with get_db() as db:
-            #         # Delete User
-            #         db.query(User).filter_by(id=id).delete()
-            #         db.commit()
+        # # Delete User Chats
+        # result = Chats.delete_chats_by_user_id(id)
+        # if result:
+        #     with get_db() as db:
+        #         # Delete User
+        #         db.query(User).filter_by(id=id).delete()
+        #         db.commit()
 
-            #     return True
-            # return False
-            return True
-        except Exception:
-            return False
+        #     return True
+        # return False
+        return True
 
+    @return_if_error(False)
     def update_user_api_key_by_id(self, id: str, api_key: str) -> bool:
-        try:
-            UserORM.where(lambda x: x.id == id).update({User.api_key: api_key})
-            return True
-        except Exception:
-            return False
+        UserORM.where(lambda x: x.id == id).update({User.api_key: api_key})
+        return True
 
+    @return_if_error(None)
     def get_user_api_key_by_id(self, id: str) -> Optional[str]:
-        try:
-            return UserORM.where(lambda x: x.id == id).first().api_key
-        except Exception:
-            return None
+        return UserORM.where(lambda x: x.id == id).first().api_key
 
     # def get_valid_user_ids(self, user_ids: list[str]) -> list[str]:
     #     with get_db() as db:

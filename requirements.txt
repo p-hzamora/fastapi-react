@@ -2,3 +2,5 @@ passlib[bcrypt]==1.7.4
 fastapi==0.111.0
 uvicorn[standard]==0.30.6
 ormlambda==3.7.0
+pyjwt
+passlib

@@ -26,8 +26,8 @@ from backend.config import (
     ADMIN_EMAIL,
     AppConfig,
 )
-from backend.routers import auths
-from backend.routers import user
+from backend.domain.auth.routers import auth
+from backend.domain.user.routers import user
 
 
 # Dummy user data
@@ -98,13 +98,8 @@ async def check_url(request: Request, call_next):
 
 
 BACKEND_API_BASE_URL = "api/v1"
-app.include_router(auths.router, prefix=f"/{BACKEND_API_BASE_URL}/auth", tags=["auths"])
+app.include_router(auth.router, prefix=f"/{BACKEND_API_BASE_URL}/auth", tags=["auths"])
 app.include_router(user.router, prefix=f"/{BACKEND_API_BASE_URL}/user", tags=["user"])
-
-
-@app.get("/", tags=["test"], response_model=dict)
-async def home():
-    return {"data": "Hello World"}
 
 
 if __name__ == "__main__":

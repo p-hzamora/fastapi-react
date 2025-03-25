@@ -13,25 +13,25 @@ from backend.env import (
     BACKEND_SESSION_COOKIE_SAME_SITE,
     BACKEND_SESSION_COOKIE_SECURE,
 )
-from backend.utils.auth import (
+from backend.domain.auth.utils import (
     create_api_key,
     create_token,
-    get_admin_user,
-    get_verified_user,
+    # get_admin_user,
+    # get_verified_user,
     get_current_user,
     get_password_hash,
 )
 from backend.constants import ERROR_MESSAGES
-from backend.utils.misc import validate_email_format
-from backend.models.auths import (
+from backend.common.misc import validate_email_format
+from backend.domain.auth.models.auth import (
     ApiKey,
     Token,
     SigninForm,
     SignupForm,
     Auths,
 )
-from backend.utils.misc import parse_duration
-from backend.models.user import Users, UserModel, UserResponse
+from backend.common.misc import parse_duration
+from backend.domain.user.models.user import Users, UserModel, UserResponse
 
 
 class RouterResponse(BaseModel):

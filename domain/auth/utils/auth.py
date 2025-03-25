@@ -7,7 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 from backend.constants import ERROR_MESSAGES
 
-from backend.models.user import Users, UserModel
+from backend.domain.user.models import Users, UserModel
 from backend.env import BACKEND_SECRET_KEY
 
 SESSION_SECRET = BACKEND_SECRET_KEY
