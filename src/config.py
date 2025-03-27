@@ -3,7 +3,7 @@ import logging
 import os
 from urllib.parse import urlparse
 
-from backend.env import log, BACKEND_AUTH
+from src.env import log, BACKEND_AUTH
 
 
 class EndpointFilter(logging.Filter):
@@ -165,7 +165,7 @@ ADMIN_EMAIL = PersistentConfig(
 ####################################
 
 BACKEND_URL = PersistentConfig(
-    "BACKEND_URL", "backend.url", os.environ.get("BACKEND_URL", "http://localhost:3000")
+    "BACKEND_URL", "src.url", os.environ.get("BACKEND_URL", "http://localhost:3000")
 )
 ENABLE_SIGNUP = PersistentConfig(
     "ENABLE_SIGNUP",

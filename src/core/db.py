@@ -1,5 +1,5 @@
 from ormlambda.databases.my_sql import MySQLRepository
-from backend.env import (
+from src.env import (
     DB_USERNAME,
     DB_PASSWORD,
     DB_HOST,

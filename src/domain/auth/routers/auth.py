@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import logging
 import datetime
 
-from backend.env import (
+from src.env import (
     SRC_LOG_LEVELS,
     BACKEND_AUTH,
     BACKEND_AUTH_TRUSTED_EMAIL_HEADER,
@@ -13,25 +13,25 @@ from backend.env import (
     BACKEND_SESSION_COOKIE_SAME_SITE,
     BACKEND_SESSION_COOKIE_SECURE,
 )
-from backend.domain.auth.utils import (
+from src.domain.auth.utils import (
     create_api_key,
-    create_token,
+    create_access_token,
     # get_admin_user,
     # get_verified_user,
     get_current_user,
     get_password_hash,
 )
-from backend.constants import ERROR_MESSAGES
-from backend.common.misc import validate_email_format
-from backend.domain.auth.models.auth import (
+from src.constants import ERROR_MESSAGES
+from src.common.misc import validate_email_format
+from src.domain.auth.models.auth import (
     ApiKey,
     Token,
     SigninForm,
     SignupForm,
     Auths,
 )
-from backend.common.misc import parse_duration
-from backend.domain.user.models.user import Users, UserModel, UserResponse
+from src.common.misc import parse_duration
+from src.domain.user.models.user import Users, UserModel, UserResponse
 
 
 class RouterResponse(BaseModel):
@@ -57,7 +57,14 @@ class SessionUserResponse(Token, UserResponse):
 
 
 @router.post("/api_key", response_model=ApiKey)
-async def generate_api_key(user: Annotated[UserModel, Depends(get_current_user)]):
+async def generate_api_key(
+    request: Request, user: Annotated[UserModel, Depends(get_current_user)]
+):
+    if not request.app.state.config.ENABLE_API_KEY:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=ERROR_MESSAGES.API_KEY_CREATION_NOT_ALLOWED,
+        )
     api_key = create_api_key()
     success = Users.update_user_api_key_by_id(user.id, api_key)
 
@@ -139,7 +146,7 @@ async def signin(request: Request, response: Response, form_data: SigninForm):
     if expires_delta:
         expires_at = int(time.time()) + int(expires_delta.total_seconds())
 
-    token = create_token(data={"id": user.id}, expires_delta=expires_delta)
+    token = create_access_token(data={"id": user.id}, expires_delta=expires_delta)
     datetime_expires_at = (
         datetime.datetime.fromtimestamp(expires_at, datetime.timezone.utc)
         if expires_at
@@ -230,7 +237,7 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
         if expires_delta:
             expires_at = int(time.time()) + int(expires_delta.total_seconds())
 
-        token = create_token(data={"id": user.id}, expires_delta=expires_delta)
+        token = create_access_token(data={"id": user.id}, expires_delta=expires_delta)
         datetime_expires_at = (
             datetime.datetime.fromtimestamp(expires_at, datetime.timezone.utc)
             if expires_at
@@ -270,3 +277,10 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, detail=ERROR_MESSAGES.DEFAULT(err)
         )
+
+
+@router.get("/signout")
+async def signout(response: Response):
+    response.delete_cookie("token")
+    return {"status": True}
+

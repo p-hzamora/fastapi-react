@@ -41,3 +41,5 @@ class ERROR_MESSAGES(str, Enum):
     ACTION_PROHIBITED = (
         "The requested action has been restricted as a security measure."
     )
+
+    UNAUTHORIZED = "401 Unauthorized"

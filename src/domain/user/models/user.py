@@ -2,7 +2,7 @@ import time
 from typing import Callable, Optional
 from pydantic import BaseModel as pyBaseModel, ConfigDict
 from ormlambda import ORM, Column, Table
-from backend.core.db import db
+from src.core.db import db
 
 
 class User(Table):

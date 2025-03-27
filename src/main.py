@@ -1,18 +1,22 @@
-from pathlib import Path
+from contextlib import asynccontextmanager
+import logging
 import time
 from fastapi import FastAPI, Request
 
 from fastapi.middleware.cors import CORSMiddleware
 import sys
 
+from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
-from backend.env import (
+from src.env import (
     ENV,
     BACKEND_AUTH_TRUSTED_EMAIL_HEADER,
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
+    SRC_LOG_LEVELS,
 )
-from backend.config import (
+from src.config import (
     CORS_ALLOW_ORIGIN,
     # Task
     BACKEND_URL,
@@ -26,25 +30,25 @@ from backend.config import (
     ADMIN_EMAIL,
     AppConfig,
 )
-from backend.domain.auth.routers import auth
-from backend.domain.user.routers import user
+from src.domain.auth.routers import auth
+from src.domain.user.routers import user
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 
-# Dummy user data
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    }
-}
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    log.info("Starts API REST")
+    yield
+    log.info("Ends API REST")
+
 
 app = FastAPI(
     docs_url="/docs" if ENV == "dev" else None,
     openapi_url="/openapi.json" if ENV == "dev" else None,
     redoc_url=None,
+    lifespan=lifespan,
 )
 
 app.state.config = AppConfig()
@@ -105,4 +109,4 @@ app.include_router(user.router, prefix=f"/{BACKEND_API_BASE_URL}/user", tags=["u
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0",port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

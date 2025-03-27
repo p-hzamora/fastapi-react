@@ -3,10 +3,10 @@ import uuid
 from pydantic import BaseModel as pyBaseModel
 from ormlambda import ORM, Table, Column
 
-from backend.domain.user.models import Users, UserModel
-from backend.env import log
+from src.domain.user.models import Users, UserModel
+from src.env import log
 
-from backend.core.db import db
+from src.core.db import db
 
 
 ####################

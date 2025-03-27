@@ -3,11 +3,11 @@ from typing import Optional
 from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from backend.env import SRC_LOG_LEVELS
-from backend.domain.user.models.user import UserModel, Users, UserRoleUpdateForm
-from backend.constants import ERROR_MESSAGES
+from src.env import SRC_LOG_LEVELS
+from src.domain.user.models.user import UserModel, Users, UserRoleUpdateForm
+from src.constants import ERROR_MESSAGES
 
-from backend.domain.auth.utils import (
+from src.domain.auth.utils import (
     get_admin_user,
     get_verified_user,
 )
