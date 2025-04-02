@@ -1,4 +1,5 @@
-from ormlambda.databases.my_sql import MySQLRepository, MySQLArgs
+from ormlambda.databases.my_sql import MySQLRepository
+from ormlambda.databases.my_sql.types import MySQLArgs
 
 from src.env import (
     DB_USERNAME,
