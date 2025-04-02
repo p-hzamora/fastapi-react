@@ -23,9 +23,6 @@ class User(Table):
     info: Column[str]
 
 
-UserORM = ORM(User, db)
-
-
 class UserSettings(pyBaseModel):
     ui: Optional[dict] = {}
     model_config = ConfigDict(extra="allow")
@@ -78,6 +75,9 @@ class UserUpdateForm(pyBaseModel):
 
 
 class UsersTable:
+    def __init__(self):
+        self.model = ORM(User, db)
+
     def insert_new_user(
         self,
         id: str,
@@ -101,20 +101,20 @@ class UsersTable:
             }
         )
         result = User(**user.model_dump())
-        UserORM.insert(result)
+        self.model.insert(result)
         return user if result else None
 
     @if_error_return(None)
     def get_user_by_id(self, id: str) -> Optional[UserModel]:
-        return UserORM.where(User.id == id).first(flavour=UserModel)
+        return self.model.where(User.id == id).first(flavour=UserModel)
 
     @if_error_return(None)
     def get_user_by_api_key(self, api_key: str) -> Optional[UserModel]:
-        return UserORM.where(User.api_key == api_key).first(flavour=UserModel)
+        return self.model.where(User.api_key == api_key).first(flavour=UserModel)
 
     @if_error_return(None)
     def get_user_by_email(self, email: str) -> Optional[UserModel]:
-        return UserORM.where(User.email == email).first(flavour=UserModel)
+        return self.model.where(User.email == email).first(flavour=UserModel)
 
     # def get_user_by_oauth_sub(self, sub: str) -> Optional[UserModel]:
     #     try:
@@ -127,7 +127,7 @@ class UsersTable:
     def get_users(
         self, skip: Optional[int] = None, limit: Optional[int] = None
     ) -> list[UserModel]:
-        query = UserORM.order(lambda x: x.created_at, order_type="DESC")
+        query = self.model.order(lambda x: x.created_at, order_type="DESC")
 
         if skip:
             query.offset(skip)
@@ -144,11 +144,11 @@ class UsersTable:
     #         return [UserModel.model_validate(user) for user in users]
 
     def get_num_users(self) -> Optional[int]:
-        return UserORM.count(execute=True)
+        return self.model.count(execute=True)
 
     @if_error_return(None)
     def get_first_user(self) -> UserModel:
-        return UserORM.order(lambda x: x.created_at, order_type="DESC").first(
+        return self.model.order(lambda x: x.created_at, order_type="DESC").first(
             flavour=UserModel
         )
 
@@ -170,8 +170,8 @@ class UsersTable:
 
     @if_error_return(None)
     def update_user_role_by_id(self, id: str, role: str) -> Optional[UserModel]:
-        UserORM.where(lambda x: x.id == id).update({"role": role})
-        user = UserORM.where(lambda x: x.id == id).first()
+        self.model.where(lambda x: x.id == id).update({"role": role})
+        user = self.model.where(lambda x: x.id == id).first()
         return UserModel.model_validate(user)
 
     # def update_user_profile_image_url_by_id(
@@ -191,10 +191,10 @@ class UsersTable:
 
     @if_error_return(None)
     def update_user_last_active_by_id(self, id: str) -> Optional[UserModel]:
-        UserORM.where(lambda x: x.id == id).update(
+        self.model.where(lambda x: x.id == id).update(
             {User.last_active_at: int(time.time())}
         )
-        user = UserORM.where(User.id == id).first()
+        user = self.model.where(User.id == id).first()
         return UserModel.model_validate(user)
 
     # def update_user_oauth_sub_by_id(
@@ -241,12 +241,12 @@ class UsersTable:
 
     @if_error_return(False)
     def update_user_api_key_by_id(self, id: str, api_key: str) -> bool:
-        UserORM.where(lambda x: x.id == id).update({User.api_key: api_key})
+        self.model.where(lambda x: x.id == id).update({User.api_key: api_key})
         return True
 
     @if_error_return(None)
     def get_user_api_key_by_id(self, id: str) -> Optional[str]:
-        return UserORM.where(lambda x: x.id == id).first().api_key
+        return self.model.where(User.id == id).first().api_key
 
     # def get_valid_user_ids(self, user_ids: list[str]) -> list[str]:
     #     with get_db() as db:
