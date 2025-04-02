@@ -1,4 +1,5 @@
-from ormlambda.databases.my_sql import MySQLRepository
+from ormlambda.databases.my_sql import MySQLRepository, MySQLArgs
+
 from src.env import (
     DB_USERNAME,
     DB_PASSWORD,
@@ -6,11 +7,10 @@ from src.env import (
     DB_DATABASE,
 )
 
-db = MySQLRepository(
-    **{
-        "user": DB_USERNAME,
-        "password": DB_PASSWORD,
-        "host": DB_HOST,
-        "database": DB_DATABASE,
-    }
-)
+config: MySQLArgs = {
+    "user": DB_USERNAME,
+    "password": DB_PASSWORD,
+    "host": DB_HOST,
+    "database": DB_DATABASE,
+}
+db = MySQLRepository(**config)

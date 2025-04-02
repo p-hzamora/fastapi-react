@@ -17,7 +17,7 @@ from src.env import (
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
     SRC_LOG_LEVELS,
     API_URI,
-
+    DB_DATABASE,
 )
 from src.config import (
     CORS_ALLOW_ORIGIN,
@@ -35,7 +35,22 @@ from src.config import (
 )
 from src.domain.auth.routers import auth
 from src.domain.user.routers import user
-from src.domain.todos.router import todos
+from src.domain.todos.routers import todos
+
+from src.core import db
+from src.domain.auth.models import Auth
+from src.domain.user.models import User
+from src.domain.todos.models import Todo
+
+from ormlambda import ORM
+
+if not db.database_exists(DB_DATABASE):
+    db.create_database(DB_DATABASE, "fail")
+    db.database = DB_DATABASE
+    ORM(Auth, db).create_table()
+    ORM(User, db).create_table()
+    ORM(Todo, db).create_table()
+
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
