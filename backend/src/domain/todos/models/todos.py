@@ -7,7 +7,7 @@ from src.common.misc import if_error_return
 
 class Todo(Table):
     __table_name__ = "todo"
-    id: Column[int] = Column(int, is_primary_key=True)
+    id: Column[int] = Column(int, is_primary_key=True, is_auto_increment=True)
     item: Column[str]
 
 
@@ -20,6 +20,16 @@ class TodoModel(BaseModel):
 
 class TodoForm(BaseModel):
     item: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "item": "Element 1",
+                }
+            ]
+        }
+    }
 
 
 class TodoTable:
