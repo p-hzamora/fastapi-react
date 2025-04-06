@@ -3,6 +3,15 @@ export interface ApiKey {
 }
 
 export interface SessionUserResponse {
+  token: string
+  token_type: string
+  
+  id: string
+  name: string
+  email: string
+  role: string
+  profile_image_url: string
+
   expires_at?: string
   permissios?: Record<string, unknown>
 }

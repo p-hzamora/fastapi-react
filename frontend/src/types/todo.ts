@@ -12,6 +12,7 @@ export const TODO_ENDPOINTS = {
     method: "GET",
     path: "/todo/",
     responseType: {} as Todo[],
+    requestType: null
   },
   todoCreate: {
     method: "POST",
