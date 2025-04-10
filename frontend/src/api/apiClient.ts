@@ -80,9 +80,9 @@ export class ApiClient {
     const { method, path } = endpoint;
 
     const finalPath = this.replacePath(path, options?.params)
-    const queryString = this.buildQueryString(options?.body)
+    const queryString = method=="GET"? this.buildQueryString(options?.body): ""
 
-    const url = `${this.baseUrl}${finalPath}/${queryString}`
+    const url = `${this.baseUrl}${finalPath}${queryString ? `?${queryString}`: ''}`
 
     const defaultheaders: HeadersInit = {
       'Content-Type': 'application/json',
@@ -104,8 +104,9 @@ export class ApiClient {
       credentials: 'include',
     }
 
-    if (options?.body && method != "GET") {
-      requestOptions.body = JSON.stringify(options?.body)
+    const body = options?.body
+    if (body && method != "GET") {
+      requestOptions.body = body instanceof URLSearchParams? body.toString(): JSON.stringify(options?.body)
 
     }
 
@@ -148,7 +149,7 @@ export class ApiClient {
     });
 
     const queryString = params.toString();
-    return queryString ? `?${queryString}` : '';
+    return queryString ? `${queryString}` : '';
   }
 
   async formRequest<K extends TodoKeys>(
