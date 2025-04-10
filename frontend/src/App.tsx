@@ -1,16 +1,27 @@
-import { ChakraProvider } from '@chakra-ui/react'
-import { defaultSystem } from "@chakra-ui/react"
-import Header from "./components/Header";
-import Login from './components/LogIn'
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import AuthProvider from './context/AuthContext';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './pages/ProtectedRoute';
 
-function App() {
-
+const App: React.FC = () => {
   return (
-    <ChakraProvider value={defaultSystem}>
-      <Header/>
-      <Login/>
-    </ChakraProvider>
-  )
-}
+    <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Add more protected routes as needed */}
+          </Route>
+          
+          {/* Redirect to login by default */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+    </AuthProvider>
+  );
+};
 
 export default App;
