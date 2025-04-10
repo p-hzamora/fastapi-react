@@ -5,7 +5,7 @@ export interface ApiKey {
 export interface User {
   token: string
   token_type: string
-  
+
   id: string
   name: string
   email: string
@@ -66,3 +66,16 @@ export const AUTH_ENDPOINTS = {
     responseType: undefined,
   }
 } as const;
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface AuthContextType extends AuthState {
+  login: (credentials: SigninForm) => Promise<void>;
+  logout: () => void;
+  clearError: () => void;
+}
