@@ -2,7 +2,7 @@ export interface ApiKey {
   api_key?: string
 }
 
-export interface SessionUserResponse {
+export interface User {
   token: string
   token_type: string
   
@@ -35,34 +35,34 @@ export interface SignupForm {
 export const AUTH_ENDPOINTS = {
   authGenerateApiKey: {
     method: "POST",
-    path: "/api_key",
+    path: "/auth/api_key",
     responseType: {} as ApiKey,
   },
   authDeleteApiKey: {
     method: "DELETE",
-    path: "/api_key",
+    path: "/auth/api_key",
     responseType: {} as boolean,
   },
   authGetApiKey: {
     method: "GET",
-    path: "/api_key",
+    path: "/auth/api_key",
     responseType: {} as ApiKey,
   },
   authSignin: {
     method: "POST",
-    path: "/signin",
-    responseType: {} as SessionUserResponse,
+    path: "/auth/signin",
+    responseType: {} as User,
     requestType: {} as SigninForm,
   },
   authSignup: {
     method: "POST",
-    path: "/signup",
-    responseType: {} as SessionUserResponse,
+    path: "/auth/signup",
+    responseType: {} as User,
     requestType: {} as SignupForm,
   },
   authSignout: {
     method: "GET",
-    path: "/signout",
+    path: "/auth/signout",
     responseType: undefined,
   }
 } as const;
