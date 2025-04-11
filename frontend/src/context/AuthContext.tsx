@@ -81,7 +81,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const storedUser = localStorage.getItem('user')
 
       if (storedUser) {
-        const user = JSON.parse(storedUser as string) as User
+        const user = JSON.parse(storedUser) as User
         dispatch({
           type: AuthType.LOGIN_SUCCESS,
           payload: {
@@ -96,7 +96,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const login = async (credentials: SigninForm) => {
     dispatch({ type: AuthType.LOGIN_REQUEST })
     try {
-      const user = await apiClient.formRequest('authSignin', {body:credentials})
+      const user = await apiClient.request('authSignin', {body:credentials})
 
       localStorage.setItem('user', JSON.stringify(user))
 
