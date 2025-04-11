@@ -80,9 +80,9 @@ export class ApiClient {
     const { method, path } = endpoint;
 
     const finalPath = this.replacePath(path, options?.params)
-    const queryString = method=="GET"? this.buildQueryString(options?.body): ""
+    const queryString = method == "GET" ? this.buildQueryString(options?.body) : ""
 
-    const url = `${this.baseUrl}${finalPath}${queryString ? `?${queryString}`: ''}`
+    const url = `${this.baseUrl}${finalPath}${queryString ? `?${queryString}` : ''}`
 
     const defaultheaders: HeadersInit = {
       'Content-Type': 'application/json',
@@ -106,7 +106,9 @@ export class ApiClient {
 
     const body = options?.body
     if (body && method != "GET") {
-      requestOptions.body = body instanceof URLSearchParams? body.toString(): JSON.stringify(options?.body)
+      requestOptions.body = typeof body === 'string' || body instanceof URLSearchParams
+        ? body
+        : JSON.stringify(body)
 
     }
 
@@ -134,7 +136,7 @@ export class ApiClient {
     return finalPath;
   }
 
-  private buildQueryString<K extends TodoKeys>(query?: EndpointRequest<K> | URLSearchParams): string {
+  private buildQueryString<K extends TodoKeys>(query?: EndpointRequest<K> | URLSearchParams | string): string {
     if (!query) return '';
 
     if (query instanceof URLSearchParams) { return query.toString() }
