@@ -114,7 +114,7 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def check_url(request: Request, call_next: RequestResponseEndpoint):
+async def measure_request_time(request: Request, call_next: RequestResponseEndpoint):
     start_time = int(time.time())
     request.state.enable_api_key = app.state.config.ENABLE_API_KEY
     response = await call_next(request)
