@@ -162,6 +162,6 @@ WEBSOCKET_MANAGER = os.environ.get("WEBSOCKET_MANAGER", "")
 # BACKEND URI
 ####################################
 
-API_VERSION = os.environ.get('API_VERSION', 'v1')
+API_VERSION = os.environ.get("API_VERSION", "v1")
 
 API_URI = f"/api/{API_VERSION}"

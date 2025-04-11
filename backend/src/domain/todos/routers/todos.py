@@ -25,12 +25,14 @@ async def update_todo(todo_id: int, todo: TodoForm) -> TodoModel:
 
 @router.post("/", response_model=TodoModel)
 async def insert_todo(todo: TodoForm) -> TodoModel:
-
     inserted_todo = Todos.insert_new_todo(todo)
 
     if not inserted_todo:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, detail=ERROR_MESSAGES.DEFAULT("There was an error while inserting new todo.")
+            status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_MESSAGES.DEFAULT(
+                "There was an error while inserting new todo."
+            ),
         )
 
     return inserted_todo
