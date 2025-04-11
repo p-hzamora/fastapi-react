@@ -7,7 +7,7 @@ from src.env import SRC_LOG_LEVELS
 from src.domain.user.models.user import UserModel, Users, UserRoleUpdateForm
 from src.constants import ERROR_MESSAGES
 
-from src.domain.auth.utils import (
+from src.domain.auth.services import (
     get_admin_user,
     get_verified_user,
 )

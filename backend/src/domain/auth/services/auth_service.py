@@ -1,92 +1,104 @@
-from typing import Optional
 import uuid
-from pydantic import BaseModel
-from ormlambda import ORM, Table, Column
+from typing import Optional, Annotated
+from fastapi import Request, HTTPException, Depends, status, BackgroundTasks
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from ormlambda import ORM
 
-from src.domain.user.models import Users, UserModel
-from src.env import log
-
+from src.constants import ERROR_MESSAGES
 from src.core.db import db
 
-from ..utils import verify_password
+from src.domain.user.models import Users, UserModel
 
-####################
-# DB MODEL
-####################
+from .. import log
+from ..models import Auth, AuthModel
+from ..utils import decode_token, verify_password
 
 
-class Auth(Table):
-    __table_name__ = "auth"
+bearer_security = HTTPBearer(auto_error=False)
 
-    id: Column[str] = Column(str, is_primary_key=True)
-    email: Column[str] = Column(str)
-    password: Column[str] = Column(str)
-    active: Column[int] = Column(int)
+
+def get_current_user(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    auth_token: Annotated[HTTPAuthorizationCredentials, Depends(bearer_security)],
+) -> UserModel:
+    token = None
+    if auth_token is not None:
+        token = auth_token.credentials
+
+    if token is None and "token" in request.cookies:
+        token = request.cookies["token"]
+
+    if token is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not authenticated")
+
+    # auth by api key
+    if token.startswith("sk-"):
+        if not request.state.enable_api_key:
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN, detail=ERROR_MESSAGES.API_KEY_NOT_ALLOWED
+            )
+
+        return get_current_user_by_api_key(token)
+
+    # auth by jwt token
+    try:
+        data = decode_token(token)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+
+    if data is not None and "id" in data:
+        user = Users.get_user_by_id(data["id"])
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=ERROR_MESSAGES.INVALID_TOKEN,
+            )
+        else:
+            # Refresh the user's last active timestamp asynchronously
+            # to prevent blocking the request
+            if background_tasks:
+                background_tasks.add_task(Users.update_user_last_active_by_id, user.id)
+        return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ERROR_MESSAGES.UNAUTHORIZED,
+        )
+
+
+def get_current_user_by_api_key(api_key: str):
+    user = Users.get_user_by_api_key(api_key)
+
+    if user is None:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail=ERROR_MESSAGES.INVALID_TOKEN
+        )
+    Users.update_user_last_active_by_id(user.id)
+
+    return user
+
+
+def get_verified_user(user: Annotated[UserModel, Depends(get_current_user)]):
+    if user.role not in {"users", "admin"}:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail=ERROR_MESSAGES.ACCESS_PROHIBITED
+        )
+    return user
+
+
+def get_admin_user(user: Annotated[UserModel, Depends(get_current_user)]) -> UserModel:
+    if user.role != "admin":
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail=ERROR_MESSAGES.ACCESS_PROHIBITED
+        )
+    return user
 
 
 AuthORM = ORM(Auth, db)
-
-
-class AuthModel(BaseModel):
-    id: str
-    email: str
-    password: str
-    active: bool = True
-
-
-####################
-# Forms
-####################
-
-
-class Token(BaseModel):
-    token: str
-    token_type: str
-
-
-class ApiKey(BaseModel):
-    api_key: Optional[str] = None
-
-
-class UserResponse(BaseModel):
-    id: str
-    email: str
-    name: str
-    role: str
-    profile_image_url: str
-
-
-class SiginResponse(Token, UserResponse): ...
-
-
-class SigninForm(BaseModel):
-    email: str
-    password: str
-
-
-class LdapForm(BaseModel):
-    user: str
-    password: str
-
-
-class ProfileImageUrlForm(BaseModel):
-    profile_image_url: str
-
-
-class UpdateProfileForm(ProfileImageUrlForm):
-    name: str
-
-
-class UpdatePasswordForm(BaseModel):
-    password: str
-    new_password: str
-
-
-class SignupForm(BaseModel):
-    name: str
-    email: str
-    password: str
-    profile_image_url: Optional[str] = "/user.png"
 
 
 class AuthsTable:
@@ -195,18 +207,10 @@ Auths = AuthsTable()
 
 
 __all__ = [
-    "Auth",
-    "AuthModel",
-    "Token",
-    "ApiKey",
-    "UserResponse",
-    "SiginResponse",
-    "SigninForm",
-    "LdapForm",
-    "ProfileImageUrlForm",
-    "UpdateProfileForm",
-    "UpdatePasswordForm",
-    "SignupForm",
-    "AuthsTable",
+    "get_current_user",
+    "get_current_user_by_api_key",
+    "get_verified_user",
+    "get_admin_user",
+    "AuthORM",
     "Auths",
 ]

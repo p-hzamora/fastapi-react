@@ -1,35 +1,34 @@
 import time
 from typing import Optional, Annotated
-from fastapi import APIRouter, Depends, Form, Request, Response, HTTPException, status
+from fastapi import APIRouter, Depends, Request, Response, HTTPException, status
 from pydantic import BaseModel
-import logging
 import datetime
 
 from src.env import (
-    SRC_LOG_LEVELS,
     BACKEND_AUTH,
     BACKEND_AUTH_TRUSTED_EMAIL_HEADER,
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
     BACKEND_SESSION_COOKIE_SAME_SITE,
     BACKEND_SESSION_COOKIE_SECURE,
 )
-from src.domain.auth.utils import (
+from ..utils import (
     create_api_key,
     create_access_token,
-    # get_admin_user,
-    # get_verified_user,
-    get_current_user,
     get_password_hash,
 )
+from ..services.auth_service import get_current_user
 from src.constants import ERROR_MESSAGES
 from src.common.misc import validate_email_format
-from src.domain.auth.models.auth import (
+
+from ..models import (
     ApiKey,
     Token,
     SigninForm,
     SignupForm,
-    Auths,
 )
+
+from ..services import Auths
+
 from src.common.misc import parse_duration
 from src.domain.user.models.user import Users, UserModel, UserResponse
 
@@ -40,10 +39,6 @@ class RouterResponse(BaseModel):
 
 
 router = APIRouter()
-
-
-log = logging.getLogger(__name__)
-log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 
 ############################
@@ -99,7 +94,7 @@ async def get_api_key(user: Annotated[UserModel, Depends(get_current_user)]):
 
 
 @router.post("/signin", response_model=SessionUserResponse)
-async def signin(request: Request, response: Response, form_data: Annotated[SigninForm,Form()]):
+async def signin(request: Request, response: Response, form_data: SigninForm):
     if BACKEND_AUTH_TRUSTED_EMAIL_HEADER:
         if BACKEND_AUTH_TRUSTED_EMAIL_HEADER not in request.headers:
             raise HTTPException(
@@ -283,4 +278,3 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
 async def signout(response: Response):
     response.delete_cookie("token")
     return {"status": True}
-

@@ -1,2 +1,11 @@
-from .utils import *  # noqa: F403
-from .models import *  # noqa: F403
+
+import logging
+
+from src.env import SRC_LOG_LEVELS
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MAIN"])
+
+from .utils import *  # noqa: F403, E402
+from .models import *  # noqa: F403, E402
+from .services import *  # noqa: F403, E402
