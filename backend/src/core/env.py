@@ -7,10 +7,10 @@ import logging
 import sys
 from typing import Literal
 
-from src.constants import ERROR_MESSAGES
+from .constants import ERROR_MESSAGES
 
-SRC_DIR = Path(__file__).parent
-
+CORE_DIR = Path(__file__).parent
+SRC_DIR = CORE_DIR.parent
 BACKEND_DIR = SRC_DIR.parent
 BASE_DIR = BACKEND_DIR.parent
 

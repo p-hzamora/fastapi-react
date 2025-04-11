@@ -4,7 +4,7 @@ import uuid
 import jwt
 from passlib.context import CryptContext
 
-from src.env import BACKEND_SECRET_KEY
+from src.core.env import BACKEND_SECRET_KEY
 
 # openssl rand -hex 32
 SESSION_SECRET = BACKEND_SECRET_KEY

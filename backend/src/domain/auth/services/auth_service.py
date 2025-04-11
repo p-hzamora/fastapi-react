@@ -4,7 +4,7 @@ from fastapi import Request, HTTPException, Depends, status, BackgroundTasks
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from ormlambda import ORM
 
-from src.constants import ERROR_MESSAGES
+from src.core.constants import ERROR_MESSAGES
 from src.core.db import db
 
 from src.domain.user.models import Users, UserModel

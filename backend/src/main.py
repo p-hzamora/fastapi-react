@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.env import (
+from src.core.env import (
     ENV,
     BACKEND_AUTH_TRUSTED_EMAIL_HEADER,
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
@@ -19,7 +19,7 @@ from src.env import (
     API_URI,
     DB_DATABASE,
 )
-from src.config import (
+from src.core.config import (
     CORS_ALLOW_ORIGIN,
     # Task
     BACKEND_URL,

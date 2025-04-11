@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from src.constants import ERROR_MESSAGES
+from src.core.constants import ERROR_MESSAGES
 
 from src.domain.auth import get_verified_user
 from src.domain.todos import Todos, TodoModel, TodoForm

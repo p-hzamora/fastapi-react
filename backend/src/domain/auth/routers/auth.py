@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request, Response, HTTPException, status
 from pydantic import BaseModel
 import datetime
 
-from src.env import (
+from src.core.env import (
     BACKEND_AUTH,
     BACKEND_AUTH_TRUSTED_EMAIL_HEADER,
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
@@ -17,7 +17,7 @@ from ..utils import (
     get_password_hash,
 )
 from ..services.auth_service import get_current_user
-from src.constants import ERROR_MESSAGES
+from src.core.constants import ERROR_MESSAGES
 from src.common.misc import validate_email_format
 
 from ..models import (
