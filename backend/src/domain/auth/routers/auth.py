@@ -30,7 +30,7 @@ from ..models import (
 from ..services import Auths
 
 from src.common.misc import parse_duration
-from src.domain.user.models.user import Users, UserModel, UserResponse
+from src.domain.user import Users, UserModel, UserResponse
 
 
 class RouterResponse(BaseModel):
