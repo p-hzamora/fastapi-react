@@ -5,9 +5,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from ormlambda import ORM
 
 from src.core.constants import ERROR_MESSAGES
-from src.core.db import db
+from src.core.db import engine
 
-from src.domain.user.models import Users, UserModel
+from src.domain.user import Users, UserModel
 
 from .. import log
 from ..models import Auth, AuthModel
@@ -30,7 +30,7 @@ def get_current_user(
         token = request.cookies["token"]
 
     if token is None:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not authenticated")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=ERROR_MESSAGES.NOT_AUTHENTICATED)
 
     # auth by api key
     if token.startswith("sk-"):
@@ -98,7 +98,7 @@ def get_admin_user(user: Annotated[UserModel, Depends(get_current_user)]) -> Use
     return user
 
 
-AuthORM = ORM(Auth, db)
+AuthORM = ORM(Auth, engine)
 
 
 class AuthsTable:
@@ -132,8 +132,7 @@ class AuthsTable:
 
         if result and user:
             return user
-        else:
-            return None
+        return None
 
     def authenticate_user(self, email: str, password: str) -> Optional[UserModel]:
         log.info(f"authenticate_user: {email}")
