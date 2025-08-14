@@ -15,7 +15,7 @@ export function useTodos(){
     const createTodos = useCallback(({})=>{}, [])
     
     return {
-        todos,
+        todo,
         getTodos,
         deleteTodos,
         createTodos,
