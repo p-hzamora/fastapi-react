@@ -85,10 +85,16 @@ DB_DATABASE = os.getenv("DB_DATABASE", None)
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 
+DB_PORT = os.getenv("DB_PORT", "3306")
+
 
 if DB_USERNAME is None or DB_PASSWORD is None:
     raise ValueError(ERROR_MESSAGES.ENV_VAR_NOT_FOUND)
 
+
+DATABASE_URL = (
+    f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}?pool_size=3"
+)
 
 ####################################
 # ENV (dev, test, prod)

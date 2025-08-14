@@ -1,17 +1,6 @@
-from ormlambda.databases.my_sql import MySQLRepository
-from ormlambda.databases.my_sql.types import MySQLArgs
+from ormlambda import create_engine
 
-from .env import (
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_HOST,
-    DB_DATABASE,
-)
+from .env import DATABASE_URL
 
-config: MySQLArgs = {
-    "user": DB_USERNAME,
-    "password": DB_PASSWORD,
-    "host": DB_HOST,
-    "database": DB_DATABASE,
-}
-db = MySQLRepository(**config)
+
+engine = create_engine(DATABASE_URL)
