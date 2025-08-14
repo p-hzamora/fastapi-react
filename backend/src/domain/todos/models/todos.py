@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from ormlambda import Table, Column, ORM
-from src.core import db
+from src.core import engine
 from src.common.misc import if_error_return
 
 
@@ -34,7 +34,7 @@ class TodoForm(BaseModel):
 
 class TodoTable:
     def __init__(self):
-        self.model = ORM(Todo, db)
+        self.model = ORM(Todo, engine)
 
     @if_error_return(None)
     def insert_new_todo(self, todo_form: TodoForm) -> Optional[TodoModel]:
