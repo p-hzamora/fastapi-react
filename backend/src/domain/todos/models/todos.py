@@ -1,14 +1,14 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
-from ormlambda import Table, Column, ORM
+from ormlambda import Table, Column, ORM, VARCHAR, INT
 from src.core import engine
 from src.common.misc import if_error_return
 
 
 class Todo(Table):
     __table_name__ = "todo"
-    id: Column[int] = Column(int, is_primary_key=True, is_auto_increment=True)
-    item: Column[str]
+    id: Column[INT] = Column(INT(), is_primary_key=True, is_auto_increment=True)
+    item: Column[VARCHAR] = Column(VARCHAR(100))
 
 
 class TodoModel(BaseModel):

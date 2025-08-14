@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from ormlambda import Table, Column
+from ormlambda import Table, Column, VARCHAR,INT, CHAR
 
 
 ####################
@@ -11,10 +11,10 @@ from ormlambda import Table, Column
 class Auth(Table):
     __table_name__ = "auth"
 
-    id: Column[str] = Column(str, is_primary_key=True)
-    email: Column[str] = Column(str)
-    password: Column[str] = Column(str)
-    active: Column[int] = Column(int)
+    id: Column[CHAR] = Column(CHAR(36), is_primary_key=True)
+    email: Column[VARCHAR] = Column(VARCHAR(255))
+    password: Column[VARCHAR] = Column(VARCHAR(255))
+    active: Column[INT] = Column(INT())
 
 
 class AuthModel(BaseModel):

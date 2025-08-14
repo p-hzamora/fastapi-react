@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel as pyBaseModel, ConfigDict
-from ormlambda import Column, Table
+from ormlambda import Column, Table, CHAR, VARCHAR, INT
 
 
 __all__ = (
@@ -16,19 +16,19 @@ __all__ = (
 
 class User(Table):
     __table_name__ = "user"
-    id: Column[str] = Column(str, is_primary_key=True)
-    name: Column[str]
-    email: Column[str]
-    role: Column[str]
-    profile_image_url: Column[str]
+    id: Column[CHAR] = Column(CHAR(36), is_primary_key=True)
+    name: Column[VARCHAR] = Column(VARCHAR(100))
+    email: Column[VARCHAR] = Column(VARCHAR(100))
+    role: Column[VARCHAR] = Column(VARCHAR(100))
+    profile_image_url: Column[VARCHAR] = Column(VARCHAR(100))
 
-    last_active_at: Column[int]  # timestamp in epoch
-    updated_at: Column[int]  # timestamp in epoch
-    created_at: Column[int]  # timestamp in epoch
+    last_active_at: Column[INT] = Column(INT())  # timestamp in epoch
+    updated_at: Column[INT] = Column(INT())  # timestamp in epoch
+    created_at: Column[INT] = Column(INT())  # timestamp in epoch
 
-    api_key: Column[str] = Column(str, is_unique=True)
-    settings: Column[str]
-    info: Column[str]
+    api_key: Column[VARCHAR] = Column(VARCHAR(40), is_unique=True)
+    settings: Column[VARCHAR] = Column(VARCHAR(100))
+    info: Column[VARCHAR] = Column(VARCHAR(100))
 
 
 class UserSettings(pyBaseModel):

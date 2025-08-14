@@ -1,1 +1,1 @@
-from .auth_model import *  # noqa: F403
+from .auth import *  # noqa: F403
