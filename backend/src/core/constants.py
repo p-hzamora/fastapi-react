@@ -43,3 +43,5 @@ class ERROR_MESSAGES(str, Enum):
     )
 
     UNAUTHORIZED = "401 Unauthorized"
+
+    NOT_AUTHENTICATED = "Not authenticated"
