@@ -37,19 +37,19 @@ from src.domain.auth.routers import auth
 from src.domain.user.routers import user
 from src.domain.todos.routers import todos
 
-from src.core import db
+from src.core import engine
 from src.domain.auth.models import Auth
 from src.domain.user.models import User
 from src.domain.todos.models import Todo
 
 from ormlambda import ORM
 
-if not db.database_exists(DB_DATABASE):
-    db.create_database(DB_DATABASE, "fail")
-    db.database = DB_DATABASE
-    ORM(Auth, db).create_table()
-    ORM(User, db).create_table()
-    ORM(Todo, db).create_table()
+if not engine.schema_exists(DB_DATABASE):
+    engine.create_schema(DB_DATABASE, "fail")
+    engine.set_database(DB_DATABASE)
+    ORM(Auth, engine).create_table()
+    ORM(User, engine).create_table()
+    ORM(Todo, engine).create_table()
 
 
 log = logging.getLogger(__name__)

@@ -4,7 +4,7 @@ from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from src.core.env import SRC_LOG_LEVELS
-from src.domain.user.models.user import UserModel, Users, UserRoleUpdateForm
+from src.domain.user import UserModel, Users, UserRoleUpdateForm
 from src.core.constants import ERROR_MESSAGES
 
 from src.domain.auth.services import (
