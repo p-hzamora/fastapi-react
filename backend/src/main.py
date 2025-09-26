@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 import logging
 import time
+from typing import Optional
 from fastapi import FastAPI, Request
 
 from fastapi.middleware.cors import CORSMiddleware
 import sys
 
+from starlette.datastructures import State
 from starlette.middleware.base import RequestResponseEndpoint
 from pathlib import Path
 
@@ -63,7 +65,19 @@ async def lifespan(app: FastAPI):
     log.info("Ends API REST")
 
 
-app = FastAPI(
+class StateMixin(State):
+    config: AppConfig
+    AUTH_TRUSTED_EMAIL_HEADER: Optional[bool]
+    AUTH_TRUSTED_NAME_HEADER: Optional[bool]
+    TOOLS: dict
+    FUNCTIONS: dict
+
+
+class FastApiMixIn(FastAPI):
+    state: StateMixin
+
+
+app: FastApiMixIn = FastAPI(
     swagger_ui_parameters={
         "syntaxHighlight.theme": "obsidian",
     },
