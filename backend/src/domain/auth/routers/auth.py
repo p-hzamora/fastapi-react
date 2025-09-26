@@ -45,6 +45,7 @@ router = APIRouter()
 # GetSessionUser
 ############################
 
+GetCurrentUser=  Annotated[UserModel, Depends(get_current_user)]
 
 class SessionUserResponse(Token, UserResponse):
     expires_at: Optional[int] = None
@@ -52,9 +53,7 @@ class SessionUserResponse(Token, UserResponse):
 
 
 @router.post("/api_key", response_model=ApiKey)
-async def generate_api_key(
-    request: Request, user: Annotated[UserModel, Depends(get_current_user)]
-):
+async def generate_api_key(request: Request, user: GetCurrentUser):
     if not request.app.state.config.ENABLE_API_KEY:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
@@ -72,12 +71,12 @@ async def generate_api_key(
 
 
 @router.delete("/api_key", response_model=bool)
-async def delete_api_key(user: Annotated[UserModel, Depends(get_current_user)]):
+async def delete_api_key(user: GetCurrentUser):
     return Users.update_user_api_key_by_id(user.id, None)
 
 
 @router.get("/api_key", response_model=ApiKey)
-async def get_api_key(user: Annotated[UserModel, Depends(get_current_user)]):
+async def get_api_key(user: GetCurrentUser):
     api_key = Users.get_user_api_key_by_id(user.id)
     if api_key:
         return {
