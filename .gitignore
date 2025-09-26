@@ -1,3 +1,21 @@
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Backend (Python/FastAPI)
+backend/__pycache__/
+backend/**/*.pyc
+backend/.env
+backend/.venv/
+backend/dist/
+backend/build/
+
+# Frontend (React/Node.js)
 # Logs
 logs
 *.log
