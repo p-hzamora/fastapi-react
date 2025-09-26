@@ -91,9 +91,9 @@ DB_PORT = os.getenv("DB_PORT", "3306")
 if DB_USERNAME is None or DB_PASSWORD is None:
     raise ValueError(ERROR_MESSAGES.ENV_VAR_NOT_FOUND)
 
-
+URI_DB_CONNECTION=f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}?pool_size=3"
 DATABASE_URL = (
-    f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}?pool_size=3"
+    f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}?pool_size=3"
 )
 
 ####################################

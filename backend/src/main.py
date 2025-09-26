@@ -19,7 +19,6 @@ from src.core.env import (
     BACKEND_AUTH_TRUSTED_NAME_HEADER,
     SRC_LOG_LEVELS,
     API_URI,
-    DB_DATABASE,
 )
 from src.core.config import (
     CORS_ALLOW_ORIGIN,
@@ -46,12 +45,19 @@ from src.domain.todos.models import Todo
 
 from ormlambda import ORM
 
-if not engine.schema_exists(DB_DATABASE):
-    engine.create_schema(DB_DATABASE, "fail")
-    engine.set_database(DB_DATABASE)
-    ORM(Auth, engine).create_table()
-    ORM(User, engine).create_table()
-    ORM(Todo, engine).create_table()
+
+auth_model= ORM(Auth, engine)
+user_model= ORM(User, engine)
+todo_model= ORM(Todo, engine)
+
+if not auth_model.table_exists():
+    auth_model.create_table()
+
+if not user_model.table_exists():
+    user_model.create_table()
+
+if not todo_model.table_exists():
+    todo_model.create_table()
 
 
 log = logging.getLogger(__name__)
